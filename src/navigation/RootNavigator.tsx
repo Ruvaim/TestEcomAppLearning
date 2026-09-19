@@ -1,5 +1,4 @@
 import React from 'react';
-import { Linking } from 'react-native';
 
 import {
   getStateFromPath,
@@ -16,6 +15,7 @@ import CartScreen from '../screens/Cart/CartScreen';
 import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
 import OrderConfirmationScreen from '../screens/OrderConfirmation/OrderConfirmationScreen';
 import LoginScreen from '../screens/Login/LoginScreen';
+import CategoryLandingScreen from '../screens/CategoryLanding/CategoryLandingScreen';
 
 import { RootStackParamList } from './types';
 import { navigationRef } from './navigationRef';
@@ -34,6 +34,10 @@ const linking = {
         parse: {
           productId: Number,
         },
+      },
+
+      CategoryLanding: {
+        path: 'category/:category',
       },
 
       Cart: 'cart',
@@ -112,6 +116,10 @@ const RootNavigator = () => {
           component={OrderConfirmationScreen}
         />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen
+          name="CategoryLanding"
+          component={CategoryLandingScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

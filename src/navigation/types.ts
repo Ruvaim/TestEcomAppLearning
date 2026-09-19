@@ -1,6 +1,10 @@
 export type RootStackParamList = {
   ProductList: undefined;
 
+  CategoryLanding: {
+    category: string;
+  };
+
   ProductDetails: {
     productId: number;
   };
