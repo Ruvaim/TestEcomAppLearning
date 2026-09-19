@@ -1,14 +1,20 @@
 import React from 'react';
 
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  getStateFromPath,
+  NavigationContainer,
+} from '@react-navigation/native';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import { store } from '../store/store';
 
 import ProductListScreen from '../screens/ProductList/ProductListScreen';
 import ProductDetailsScreen from '../screens/ProductDetails/ProductDetailsScreen';
 import CartScreen from '../screens/Cart/CartScreen';
 import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
 import OrderConfirmationScreen from '../screens/OrderConfirmation/OrderConfirmationScreen';
+import LoginScreen from '../screens/Login/LoginScreen';
 
 import { RootStackParamList } from './types';
 
@@ -33,11 +39,51 @@ const linking = {
       Checkout: 'checkout',
     },
   },
+
+  getStateFromPath: (path: string, options: any) => {
+    const isAuthenticated = store.getState().auth.isAuthenticated;
+    const cartItems = store.getState().cart.items;
+
+    if (cartItems?.length === 0) {
+      return {
+        routes: [
+          {
+            name: 'Cart',
+          },
+        ],
+        index: 0,
+      };
+    }
+    if (path === 'checkout' && !isAuthenticated) {
+      return {
+        routes: [
+          {
+            name: 'Login',
+            params: {
+              redirect: {
+                screen: 'Checkout',
+                params: undefined,
+                resetAfterLogin: true,
+              },
+            },
+          },
+        ],
+        index: 0,
+      };
+    }
+
+    return getStateFromPath(path, options);
+  },
 };
 
 const RootNavigator = () => {
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer
+      linking={linking}
+      onStateChange={state => {
+        console.log('NAVIGATION STATE:', JSON.stringify(state, null, 2));
+      }}
+    >
       <Stack.Navigator
         initialRouteName="ProductList"
         screenOptions={{
@@ -56,6 +102,7 @@ const RootNavigator = () => {
           name="OrderConfirmation"
           component={OrderConfirmationScreen}
         />
+        <Stack.Screen name="Login" component={LoginScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

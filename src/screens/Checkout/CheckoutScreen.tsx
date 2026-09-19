@@ -38,7 +38,7 @@ const checkoutSchema = z.object({
 
   email: z.string().email('Please enter a valid email'),
 
-  address: z.string().min(10, 'Please enter a valid address'),
+  address: z.string().min(5, 'Please enter a valid address'),
 
   city: z.string().min(2, 'Please enter your city'),
 
@@ -87,6 +87,10 @@ const CheckoutScreen = ({ navigation }: Props) => {
     });
   };
 
+  const onPlaceOrderPress = () => {
+    handleSubmit(handlePlaceOrder)();
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
@@ -95,7 +99,7 @@ const CheckoutScreen = ({ navigation }: Props) => {
             if (navigation.canGoBack()) {
               navigation.goBack();
             } else {
-              navigation.navigate('Cart');
+              navigation.navigate('ProductList');
             }
           }}
         >
@@ -219,7 +223,7 @@ const CheckoutScreen = ({ navigation }: Props) => {
 
         <TouchableOpacity
           style={styles.placeOrderButton}
-          onPress={() => handleSubmit(handlePlaceOrder)}
+          onPress={onPlaceOrderPress}
         >
           <Text style={styles.placeOrderText}>Place Order</Text>
         </TouchableOpacity>

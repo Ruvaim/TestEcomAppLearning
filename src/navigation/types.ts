@@ -7,9 +7,21 @@ export type RootStackParamList = {
 
   Cart: undefined;
 
+  Login: {
+    redirect?: Redirect;
+  };
+
   Checkout: undefined;
 
   OrderConfirmation: {
     orderId: string;
   };
 };
+
+export type Redirect = {
+  [K in Exclude<keyof RootStackParamList, 'Login'>]: {
+    screen: K;
+    params: RootStackParamList[K];
+    resetAfterLogin?: boolean;
+  };
+}[Exclude<keyof RootStackParamList, 'Login'>];

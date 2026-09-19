@@ -12,11 +12,7 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaProvider>
-          <StatusBar
-            barStyle="dark-content"
-            backgroundColor="#FFFFFF"
-            translucent={false}
-          />
+          <StatusBar barStyle="dark-content" />
 
           <RootNavigator />
         </SafeAreaProvider>

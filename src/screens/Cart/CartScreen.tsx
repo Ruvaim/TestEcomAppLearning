@@ -8,28 +8,20 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
 import { useDispatch, useSelector } from 'react-redux';
-
 import {
   decreaseQuantity,
   increaseQuantity,
   removeFromCart,
 } from '../../store/cartSlice';
-
 import { RootState } from '../../store/store';
-
 import { RootStackParamList } from '../../navigation/types';
-
 import CartItem from '../../components/CartItem';
-
 import EmptyState from '../../components/EmptyState';
-
 import { COLORS } from '../../constants/colors';
-
 import { formatCurrency } from '../../utils/currency';
+import { navigateWithAuth } from '../../navigation/authNavigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Cart'>;
 
@@ -37,8 +29,10 @@ const DELIVERY_CHARGE = 50;
 
 const CartScreen = ({ navigation }: Props) => {
   const dispatch = useDispatch();
-
   const cartItems = useSelector((state: RootState) => state.cart.items);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
 
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -47,12 +41,19 @@ const CartScreen = ({ navigation }: Props) => {
 
   const delivery = cartItems.length > 0 ? DELIVERY_CHARGE : 0;
 
-  const total = subtotal + delivery;
+  const mainTotal = subtotal + delivery;
 
   const totalItems = cartItems.reduce(
     (total, item) => total + item.quantity,
     0,
   );
+
+  const handleCheckout = () => {
+    navigateWithAuth(navigation, isAuthenticated, {
+      screen: 'Checkout',
+      params: undefined,
+    });
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -139,12 +140,12 @@ const CartScreen = ({ navigation }: Props) => {
         <View style={styles.summaryRow}>
           <Text style={styles.totalLabel}>Total</Text>
 
-          <Text style={styles.total}>{formatCurrency(total)}</Text>
+          <Text style={styles.total}>{formatCurrency(mainTotal)}</Text>
         </View>
 
         <TouchableOpacity
           style={styles.checkoutButton}
-          onPress={() => navigation.navigate('Checkout')}
+          onPress={handleCheckout}
         >
           <Text style={styles.checkoutText}>Proceed to Checkout</Text>
         </TouchableOpacity>

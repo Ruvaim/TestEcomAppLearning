@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 
 import { addToCart } from '../../store/cartSlice';
+import { logout } from '../../store/authSlice';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
@@ -40,6 +41,9 @@ const ProductListScreen = ({ navigation }: Props) => {
   const dispatch = useDispatch();
 
   const cartItems = useSelector((state: RootState) => state.cart.items);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -60,10 +64,12 @@ const ProductListScreen = ({ navigation }: Props) => {
     },
   );
 
-  const { data: categoryData, isLoading: categoryLoading } =
-    useGetProductsByCategoryQuery(selectedCategory, {
+  const { data: categoryData } = useGetProductsByCategoryQuery(
+    selectedCategory,
+    {
       skip: selectedCategory === 'all',
-    });
+    },
+  );
 
   const { data: categoriesData } = useGetCategoriesQuery();
 
@@ -84,7 +90,6 @@ const ProductListScreen = ({ navigation }: Props) => {
     categoryData,
     productsData,
   ]);
-  const isLoading = productsLoading || searchLoading || categoryLoading;
 
   const isError = productsError && !search.trim() && selectedCategory === 'all';
 
@@ -100,6 +105,15 @@ const ProductListScreen = ({ navigation }: Props) => {
         quantity: 1,
       }),
     );
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'ProductList' }],
+    });
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -120,6 +134,11 @@ const ProductListScreen = ({ navigation }: Props) => {
         <View>
           <Text style={styles.heading}>Find your products</Text>
         </View>
+        {isAuthenticated && (
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={styles.cartButton}
@@ -217,12 +236,26 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 16,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+
+  logoutButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+
+  logoutText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
   },
 
   greeting: {

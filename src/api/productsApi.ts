@@ -1,5 +1,14 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+import { Product } from '../types/product';
+
+type ProductsResponse = {
+  products: Product[];
+  total: number;
+  skip: number;
+  limit: number;
+};
+
 export const productsApi = createApi({
   reducerPath: 'productsApi',
 
@@ -8,24 +17,24 @@ export const productsApi = createApi({
   }),
 
   endpoints: builder => ({
-    getProducts: builder.query({
+    getProducts: builder.query<ProductsResponse, void>({
       query: () => '/products?limit=30',
     }),
 
-    getProductById: builder.query({
+    getProductById: builder.query<Product, number>({
       query: (id: number) => `/products/${id}`,
     }),
 
-    searchProducts: builder.query({
+    searchProducts: builder.query<ProductsResponse, string>({
       query: (search: string) =>
         `/products/search?q=${encodeURIComponent(search)}`,
     }),
 
-    getCategories: builder.query({
+    getCategories: builder.query<string[], void>({
       query: () => '/products/category-list',
     }),
 
-    getProductsByCategory: builder.query({
+    getProductsByCategory: builder.query<ProductsResponse, string>({
       query: (category: string) =>
         `/products/category/${encodeURIComponent(category)}`,
     }),
