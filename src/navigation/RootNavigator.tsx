@@ -1,4 +1,5 @@
 import React from 'react';
+import { Linking } from 'react-native';
 
 import {
   getStateFromPath,
@@ -17,6 +18,7 @@ import OrderConfirmationScreen from '../screens/OrderConfirmation/OrderConfirmat
 import LoginScreen from '../screens/Login/LoginScreen';
 
 import { RootStackParamList } from './types';
+import { navigationRef } from './navigationRef';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -37,6 +39,12 @@ const linking = {
       Cart: 'cart',
 
       Checkout: 'checkout',
+
+      OrderConfirmation: {
+        path: 'order/:orderId',
+      },
+
+      Login: 'login',
     },
   },
 
@@ -44,7 +52,7 @@ const linking = {
     const isAuthenticated = store.getState().auth.isAuthenticated;
     const cartItems = store.getState().cart.items;
 
-    if (cartItems?.length === 0) {
+    if (path === 'checkout' && cartItems.length === 0) {
       return {
         routes: [
           {
@@ -74,11 +82,62 @@ const linking = {
 
     return getStateFromPath(path, options);
   },
+
+  subscribe(listener: (url: string) => void) {
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      console.log('DEEP LINK RECEIVED:', url);
+
+      const isAuthenticated = store.getState().auth.isAuthenticated;
+      const cartItems = store.getState().cart.items;
+
+      if (url === 'myapp://checkout') {
+        if (cartItems.length === 0) {
+          navigationRef.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'Cart',
+              },
+            ],
+          });
+
+          return;
+        }
+
+        if (!isAuthenticated) {
+          navigationRef.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'Login',
+                params: {
+                  redirect: {
+                    screen: 'Checkout',
+                    params: undefined,
+                    resetAfterLogin: true,
+                  },
+                },
+              },
+            ],
+          });
+
+          return;
+        }
+      }
+
+      listener(url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  },
 };
 
 const RootNavigator = () => {
   return (
     <NavigationContainer
+      ref={navigationRef}
       linking={linking}
       onStateChange={state => {
         console.log('NAVIGATION STATE:', JSON.stringify(state, null, 2));
