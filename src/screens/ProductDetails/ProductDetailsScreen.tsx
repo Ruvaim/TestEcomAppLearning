@@ -396,7 +396,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  /* Top Back Button */
   backButton: {
     position: 'absolute',
     top: 16,
@@ -426,7 +425,6 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
 
-  /* Top Cart Button */
   cartTopButton: {
     position: 'absolute',
     top: 16,
@@ -453,7 +451,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-  /* Sticky Bottom Bar */
   bottomBar: {
     paddingHorizontal: 16,
     paddingTop: 12,
@@ -485,7 +482,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  /* Toast */
   toast: {
     position: 'absolute',
     left: 20,
